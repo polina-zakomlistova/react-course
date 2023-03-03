@@ -6,6 +6,8 @@ import Modal from './Modal';
 export default function App() {
     let [products, setProducts] = useState(productsStub());
 
+    const [showDetails, setShowDetails] = useState(false);
+
     let setCntHandle = (id, cnt) => {
         setProducts(products.map((pr) => (pr.id !== id ? pr : { ...pr, cnt })));
         // let newProducts = [...products];
@@ -55,7 +57,7 @@ export default function App() {
                             <td>{pr.price}</td>
                             <MinMax
                                 max={pr.rest}
-                                min={10}
+                                min={1}
                                 current={pr.cnt}
                                 onChange={(cnt) => setCntHandle(pr.id, cnt)}
                             />
@@ -86,7 +88,16 @@ export default function App() {
                     </tr>
                 </tfoot>
             </table>
-            <Modal />
+            <div onClick={() => setShowDetails(true)}>Show details</div>
+            <Modal
+                showed={showDetails}
+                onClose={() => setShowDetails(false)}
+                title={`${products.length} products worth ${totalCost}$ in cart, please pay for the order`}
+                buttonText={'pay'}
+                buttonClick={() => {
+                    console.log('Paid!');
+                }}
+            />
         </div>
     );
 }

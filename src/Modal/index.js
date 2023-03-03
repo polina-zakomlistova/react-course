@@ -4,20 +4,30 @@ import styles from './style.module.css';
 
 import useClickOutsize from '../hooks/useClickOutsize';
 
-export default function Modal() {
-    const [classContainer, setClassContainer] = useState(styles.container);
+export default function Modal(props) {
+    const { title, buttonText, buttonClick, showed, onClose } = props;
+    let classContainer = [styles.container];
+
     const modalRef = useRef();
 
-    const hideElement = () => {
-        setClassContainer(classContainer + ' ' + styles.hidden);
-    };
-    useClickOutsize(modalRef, hideElement);
+    if (!showed) {
+        classContainer.push(styles.hidden);
+    }
+
+    useClickOutsize(modalRef, () => {
+        if (showed) {
+            onClose();
+        }
+    });
 
     console.log(classContainer);
 
     return (
-        <alert ref={modalRef} className={classContainer}>
-            <div>Щелкни мимо меня!</div>
-        </alert>
+        <div ref={modalRef} className={classContainer.join(' ')}>
+            <p>{title}</p>
+            <button className="btn btn-success" onClick={buttonClick}>
+                {buttonText}
+            </button>
+        </div>
     );
 }
