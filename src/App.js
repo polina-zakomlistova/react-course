@@ -2,11 +2,14 @@ import React, { useMemo, useState } from 'react';
 import MinMax from './MinMax';
 
 import Modal from './Modal';
+import BModal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
 
 export default function App() {
     let [products, setProducts] = useState(productsStub());
 
     const [showDetails, setShowDetails] = useState(false);
+    const [showFAQ, setShowFAQ] = useState(false);
 
     let setCntHandle = (id, cnt) => {
         setProducts(products.map((pr) => (pr.id !== id ? pr : { ...pr, cnt })));
@@ -83,12 +86,16 @@ export default function App() {
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td>Total cost</td>
-                        <td>{totalCost}</td>
+                        <td>
+                            <strong>Total cost</strong>
+                        </td>
+                        <td>
+                            <strong>{totalCost}</strong>
+                        </td>
                     </tr>
                 </tfoot>
             </table>
-            <div onClick={() => setShowDetails(true)}>Show details</div>
+            <strong onClick={() => setShowDetails(true)}>Show details</strong>
             <Modal
                 showed={showDetails}
                 onClose={() => setShowDetails(false)}
@@ -97,7 +104,48 @@ export default function App() {
                 buttonClick={() => {
                     console.log('Paid!');
                 }}
-            />
+            >
+                <table>
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Title</th>
+                            <th>Price</th>
+                            <th>Cnt</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {products.map((pr, i) => (
+                            <tr key={pr.id}>
+                                <td>{i + 1}</td>
+                                <td>{pr.title}</td>
+                                <td>{pr.price}</td>
+                                <td>{pr.cnt}</td>
+                                <td>{pr.price * pr.cnt}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </Modal>
+            <footer>
+                <hr></hr>
+                <strong onClick={() => setShowFAQ(true)}>FAQ</strong>
+                <BModal show={showFAQ} onHide={() => setShowFAQ(false)}>
+                    <BModal.Header>Attention!</BModal.Header>
+                    <BModal.Body>
+                        <p>Hello, I`m modal-bootstrap</p>
+                    </BModal.Body>
+                    <BModal.Footer>
+                        <Button
+                            variant="secondary"
+                            onClick={() => setShowFAQ(false)}
+                        >
+                            Close
+                        </Button>
+                    </BModal.Footer>
+                </BModal>
+            </footer>
         </div>
     );
 }

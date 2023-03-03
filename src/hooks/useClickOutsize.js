@@ -9,10 +9,12 @@ export default function (ref, func) {
     };
 
     useEffect(() => {
-        window.addEventListener('click', clickHandler);
+        window.addEventListener('mousedown', clickHandler);
+        window.addEventListener('touchstart', clickHandler);
 
         return () => {
-            window.removeEventListener('click', clickHandler);
+            window.addEventListener('mousedown', clickHandler);
+            window.addEventListener('touchstart', clickHandler);
         };
     }, [ref, func]);
 }
