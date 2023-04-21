@@ -51,7 +51,7 @@ export default function MinMaxLazy(props) {
         }
     }
 
-    let paddingSize = Math.min(parseInt(width / 300), 5);
+    let paddingSize = Math.min(parseInt(width / 600), 5);
     let classNamePadding = `p-${paddingSize}`;
 
     return (

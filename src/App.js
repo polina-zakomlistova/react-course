@@ -1,152 +1,128 @@
-import React, { useMemo, useState } from 'react';
-import MinMax from './MinMax';
+import React, { useState } from 'react';
 
-import Modal from './Modal';
-import BModal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
+import Cart from './Cart';
+import Order from './Order';
+import Result from './Result';
+
+import SettingsContext from './Context/Settings';
 
 export default function App() {
+    //setttings
+    let [settings, setSetting] = useState({ lang: 'ru', theme: 'dark' });
+    //router parody
+    const [page, setPage] = useState('cart');
+    //products
     let [products, setProducts] = useState(productsStub());
+    //order
+    let [orderForm, setOrderForm] = useState([
+        {
+            name: 'email',
+            label: 'Email',
+            value: '',
+            valid: false,
+            pattern: /[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,4}$/,
+        },
+        {
+            name: 'phone',
+            label: 'Phone',
+            value: '',
+            valid: false,
+            pattern: /^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/,
+        },
+        {
+            name: 'name',
+            label: 'Name',
+            value: '',
+            valid: false,
+            pattern: /^.{2,}$/,
+        },
+    ]);
 
-    const [showDetails, setShowDetails] = useState(false);
-    const [showFAQ, setShowFAQ] = useState(false);
+    let orderFormUpdate = (name, value) => {
+        setOrderForm(
+            orderForm.map((field) => {
+                if (field.name != name) {
+                    return field;
+                }
 
-    let setCntHandle = (id, cnt) => {
-        setProducts(products.map((pr) => (pr.id !== id ? pr : { ...pr, cnt })));
-        // let newProducts = [...products];
-        // let productIndex = products.findIndex((el) => el.id === id);
-        // let newProduct = { ...products[productIndex] };
-
-        // newProduct.cnt = cnt;
-        // newProducts[id] = newProduct;
-        // setProducts(newProducts);
+                let valid = field.pattern.test(value);
+                return { ...field, value, valid };
+            })
+        );
     };
 
-    let deleteProductHandle = (id) => {
+    let setProductCntHandle = (id, cnt) => {
+        setProducts(products.map((pr) => (pr.id !== id ? pr : { ...pr, cnt })));
+    };
+    let removeProductHandle = (id) => {
         setProducts(products.filter((pr) => pr.id !== id));
     };
 
-    const totalCost = products.reduce(
-        (accumulator, current) => accumulator + current.price * current.cnt,
-        0
-    );
+    const moveToCart = () => setPage('cart');
+    const moveToOrder = () => setPage('order');
+    const moveToResult = () => setPage('result');
 
-    // Тяжелая операция, применятт, если тысячи строк, иначе спорно
-    //const totalCost2 = useMemo(() =>
-    //     products.reduce(
-    //         (accumulator, current) => accumulator + current.price * current.cnt,
-    //         0
-    //     ),[products]
-    // );
+    let orderData = {};
+
+    orderForm.forEach((field) => {
+        orderData[field.name] = field.value;
+    });
 
     return (
-        <div className="container">
-            <h1>Products list</h1>
-            <table>
-                <thead>
-                    <tr>
-                        <th>№</th>
-                        <th>Title</th>
-                        <th>Price</th>
-                        <th>Cnt</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {products.map((pr, i) => (
-                        <tr key={pr.id}>
-                            <td>{i + 1}</td>
-                            <td>{pr.title}</td>
-                            <td>{pr.price}</td>
-                            <MinMax
-                                max={pr.rest}
-                                min={1}
-                                current={pr.cnt}
-                                onChange={(cnt) => setCntHandle(pr.id, cnt)}
-                            />
-                            <td>{pr.price * pr.cnt}</td>
-                            <td>
-                                <button
-                                    className="btn btn-danger"
-                                    type="button"
-                                    onClick={() => deleteProductHandle(pr.id)}
-                                >
-                                    Delete
-                                </button>
-                                <button
-                                    className="btn btn-success"
-                                    type="button"
-                                    onClick={() => setCntHandle(pr.id, pr.rest)}
-                                >
-                                    Buy all
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td>
-                            <strong>Total cost</strong>
-                        </td>
-                        <td>
-                            <strong>{totalCost}</strong>
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
-            <strong onClick={() => setShowDetails(true)}>Show details</strong>
-            <Modal
-                showed={showDetails}
-                onClose={() => setShowDetails(false)}
-                title={`${products.length} products worth ${totalCost}$ in cart, please pay for the order`}
-                buttonText={'pay'}
-                buttonClick={() => {
-                    console.log('Paid!');
-                }}
-            >
-                <table>
-                    <thead>
-                        <tr>
-                            <th>№</th>
-                            <th>Title</th>
-                            <th>Price</th>
-                            <th>Cnt</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {products.map((pr, i) => (
-                            <tr key={pr.id}>
-                                <td>{i + 1}</td>
-                                <td>{pr.title}</td>
-                                <td>{pr.price}</td>
-                                <td>{pr.cnt}</td>
-                                <td>{pr.price * pr.cnt}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </Modal>
-            <footer>
-                <hr></hr>
-                <strong onClick={() => setShowFAQ(true)}>FAQ</strong>
-                <BModal show={showFAQ} onHide={() => setShowFAQ(false)}>
-                    <BModal.Header>Attention!</BModal.Header>
-                    <BModal.Body>
-                        <p>Hello, I`m modal-bootstrap</p>
-                    </BModal.Body>
-                    <BModal.Footer>
-                        <Button
-                            variant="secondary"
-                            onClick={() => setShowFAQ(false)}
-                        >
-                            Close
-                        </Button>
-                    </BModal.Footer>
-                </BModal>
-            </footer>
-        </div>
+        <SettingsContext.Provider value={settings}>
+            (
+            <div className="container mt-1">
+                <button
+                    type="button"
+                    onClick={() => setSetting({ ...settings, theme: 'light' })}
+                >
+                    light
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setSetting({ ...settings, theme: 'dark' })}
+                >
+                    dark
+                </button>
+
+                <button
+                    type="button"
+                    onClick={() => setSetting({ ...settings, lang: 'ru' })}
+                >
+                    ru
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setSetting({ ...settings, lang: 'en' })}
+                >
+                    en
+                </button>
+                {page === 'cart' && (
+                    <Cart
+                        onNext={moveToOrder}
+                        products={products}
+                        onChange={setProductCntHandle}
+                        onRemove={removeProductHandle}
+                    />
+                )}
+                {page === 'order' && (
+                    <Order
+                        onNext={moveToResult}
+                        onPrev={moveToCart}
+                        fields={orderForm}
+                        onChange={orderFormUpdate}
+                    />
+                )}
+                {page === 'result' && (
+                    <Result
+                        products={products}
+                        orderData={orderData}
+                        onNext={moveToCart}
+                    />
+                )}
+            </div>
+            );
+        </SettingsContext.Provider>
     );
 }
 
