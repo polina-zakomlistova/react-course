@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useContext } from 'react';
+
 import MinMax from './../MinMax';
+//context
+import { observer } from 'mobx-react-lite';
+import useStore from '../hooks/useStore';
+//import StoreContext from './../Context/store';
+export default observer(Cart);
 
-export default function (props) {
-    const { onNext, products, onChange, onRemove } = props;
+function Cart(props) {
+    const { onNext } = props;
+    const [cart] = useStore('cart');
+    const { products, total, remove, change } = cart;
 
-    const totalCost = products.reduce(
-        (accumulator, current) => accumulator + current.price * current.cnt,
-        0
-    );
     return (
         <div>
             <h1>Cart</h1>
@@ -32,7 +36,7 @@ export default function (props) {
                                 max={pr.rest}
                                 min={1}
                                 current={pr.cnt}
-                                onChange={(cnt) => onChange(pr.id, cnt)}
+                                onChange={(cnt) => change(pr.id, cnt)}
                             />
 
                             <td>{pr.price * pr.cnt}</td>
@@ -40,14 +44,14 @@ export default function (props) {
                                 <button
                                     className="btn btn-danger"
                                     type="button"
-                                    onClick={() => onRemove(pr.id)}
+                                    onClick={() => remove(pr.id)}
                                 >
                                     Delete
                                 </button>
                                 <button
                                     className="btn btn-success"
                                     type="button"
-                                    onClick={() => onChange(pr.id, pr.rest)}
+                                    onClick={() => change(pr.id, pr.rest)}
                                 >
                                     Buy all
                                 </button>
@@ -58,7 +62,7 @@ export default function (props) {
                 <tfoot>
                     <tr>
                         <td>Total cost</td>
-                        <td>{totalCost}</td>
+                        <td>{total}</td>
                     </tr>
                 </tfoot>
             </table>

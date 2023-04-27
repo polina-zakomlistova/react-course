@@ -1,13 +1,31 @@
 import React, { useContext, useState } from 'react';
+
 import Styles from './style.module.css';
+//components
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import SettingsContext from './../Context/Settings';
+import BModal from './../BootstrapModal';
+//context
+import { observer } from 'mobx-react-lite';
+import useStore from '../hooks/useStore';
+import SettingsContext from '../Context/settings';
 
-export default function (props) {
-    const { onNext, onPrev, fields, onChange } = props;
+export default observer(Order);
+
+function Order(props) {
+    const { onNext, onPrev } = props;
+    const [order] = useStore('order');
+    const { fields, fieldUpdate, formValid } = order;
     const Settings = useContext(SettingsContext);
-    let isValid = fields.every((f) => f.valid);
+
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+    const sendForm = () => {
+        onNext();
+        order.send();
+    };
 
     return (
         <div
@@ -17,6 +35,13 @@ export default function (props) {
         >
             <h1>Input data</h1>
             <hr></hr>
+            <BModal
+                title="Attention!"
+                body="Are you sure thet these orders are correct?"
+                onClose={handleClose}
+                onClick={sendForm}
+                show={show}
+            />
             <Form>
                 {fields.map((field) => (
                     <Form.Group
@@ -37,7 +62,7 @@ export default function (props) {
                             pattern={field.pattern}
                             value={field.value}
                             onChange={(e) => {
-                                onChange(field.name, e.target.value.trim());
+                                fieldUpdate(field.name, e.target.value);
                             }}
                         />
                     </Form.Group>
@@ -45,8 +70,8 @@ export default function (props) {
                 <button
                     type="submit"
                     className="btn btn-primary"
-                    onClick={onNext}
-                    disabled={!isValid}
+                    onClick={handleShow}
+                    disabled={!formValid}
                 >
                     in result
                 </button>
