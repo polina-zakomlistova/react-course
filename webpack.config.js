@@ -12,6 +12,7 @@ let conf = {
         static: {
             directory: path.join(__dirname, '.'),
         },
+        historyApiFallback: true,
     },
     module: {
         rules: [

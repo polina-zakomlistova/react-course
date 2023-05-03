@@ -1,24 +1,47 @@
 import { makeAutoObservable } from 'mobx';
 
 export default class Cart {
-    products = productsStub();
+    items = [
+        { id: 100, cnt: 3 },
+        { id: 101, cnt: 1 },
+    ];
+
+    get inCart() {
+        return (id) => this.items.some((item) => item.id == id);
+    }
 
     change = (id, cnt) => {
-        let product = this.products.find((pr) => pr.id == id);
-        if (product !== undefined) {
-            product.cnt = Math.max(1, Math.min(product.rest, cnt));
+        let item = this.items.find((pr) => pr.id == id);
+        let details = this.itemsDetailed.find((pr) => pr.id == id);
+        if (item !== undefined) {
+            item.cnt = Math.max(1, Math.min(details.rest, cnt));
+        }
+    };
+
+    add = (id) => {
+        if (!this.inCart(id)) {
+            this.items.push({ id: id, cnt: 1 });
+        } else {
+            let item = this.items.find((item) => item.id == id);
+            this.change(id, item.cnt + 1);
         }
     };
 
     remove = (id) => {
-        this.products = this.products.filter((pr) => pr.id !== id);
+        this.items = this.items.filter((pr) => pr.id !== id);
     };
 
     get total() {
-        return this.products.reduce(
-            (accumulator, current) => accumulator + current.price * current.cnt,
-            0
-        );
+        return this.itemsDetailed.reduce((accumulator, current) => {
+            return accumulator + current.price * current.cnt;
+        }, 0);
+    }
+
+    get itemsDetailed() {
+        return this.items.map((item) => {
+            let currenPr = this.rootStore.products.getById(item.id);
+            return { ...currenPr, ...item };
+        });
     }
 
     constructor(rootStore) {
@@ -33,37 +56,4 @@ export default class Cart {
     //     this.remove = action(this.remove);
     //     this.change = action(this.change);
     // }
-}
-
-function productsStub() {
-    return [
-        {
-            id: 100,
-            title: 'Ipnone 200',
-            price: 12000,
-            rest: 5000,
-            cnt: 10,
-        },
-        {
-            id: 101,
-            title: 'Samsung AAZ8',
-            price: 22000,
-            rest: 5,
-            cnt: 1,
-        },
-        {
-            id: 103,
-            title: 'Nokia 3310',
-            price: 5000,
-            rest: 2,
-            cnt: 1,
-        },
-        {
-            id: 105,
-            title: 'Huawei ZZ',
-            price: 15000,
-            rest: 8,
-            cnt: 1,
-        },
-    ];
 }

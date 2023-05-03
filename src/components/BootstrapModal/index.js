@@ -3,21 +3,19 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
 export default function StaticExample(props) {
-    const { title, body, onClose, show, onClick } = props;
+    const { title, body, onClose, show, onClick, onExited } = props;
 
     return (
         <div
             className="modal show"
             style={{ display: 'block', position: 'initial' }}
         >
-            <Modal show={show} onHide={onClose}>
+            <Modal show={show} onHide={onClose} onExited={onExited}>
                 <Modal.Header closeButton>
                     <Modal.Title>{title}</Modal.Title>
                 </Modal.Header>
 
-                <Modal.Body>
-                    <p>{body}</p>
-                </Modal.Body>
+                <Modal.Body>{body}</Modal.Body>
 
                 <Modal.Footer>
                     <Button variant="secondary" onClick={onClick}>

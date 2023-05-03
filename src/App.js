@@ -1,63 +1,49 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-import Cart from './Cart';
-import Order from './Order';
-import Result from './Result';
+import RouterView from './Routes';
 
-import SettingContext from './Context/settings';
+import CartInfo from './components/Cart';
+
 export default function App() {
-    //settings
-    let [settings, setSetting] = useState({ lang: 'ru', theme: 'dark' });
-    //router parody
-    const [page, setPage] = useState('cart');
-
-    const moveToCart = () => setPage('cart');
-    const moveToOrder = () => setPage('order');
-    const moveToResult = () => setPage('result');
-
     return (
-        <SettingContext.Provider value={settings}>
-            (
-            <div className="container mt-1">
-                <header>
-                    <button
-                        type="button"
-                        onClick={() =>
-                            setSetting({ ...settings, theme: 'light' })
-                        }
-                    >
-                        light
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() =>
-                            setSetting({ ...settings, theme: 'dark' })
-                        }
-                    >
-                        dark
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={() => setSetting({ ...settings, lang: 'ru' })}
-                    >
-                        ru
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setSetting({ ...settings, lang: 'en' })}
-                    >
-                        en
-                    </button>
-                </header>
-
-                {page === 'cart' && <Cart onNext={moveToOrder} />}
-                {page === 'order' && (
-                    <Order onNext={moveToResult} onPrev={moveToCart} />
-                )}
-                {page === 'result' && <Result onNext={moveToCart} />}
+        <>
+            <header>
+                <div className="container mt-1">
+                    <div className="row justify-content-between">
+                        <div className="col">Logo</div>
+                        <CartInfo />
+                    </div>
+                </div>
+            </header>
+            <div className="container">
+                <div className="row">
+                    <aside className="col col-3">
+                        <ul className="list-group">
+                            <li className="list-group-item">
+                                <Link to={'/'}>Home</Link>
+                            </li>
+                            <li className="list-group-item">
+                                <Link to={'/cart'}>Cart</Link>
+                            </li>
+                            <li className="list-group-item">
+                                <Link to={'/order'}>Order</Link>
+                            </li>
+                            <li className="list-group-item">
+                                <Link to={'/result'}>Result</Link>
+                            </li>
+                        </ul>
+                    </aside>
+                    <main className="col col-9">
+                        <RouterView />
+                    </main>
+                </div>
             </div>
-            );
-        </SettingContext.Provider>
+
+            <footer className="mt-1">
+                <hr></hr>
+                <div className="container">2023</div>
+            </footer>
+        </>
     );
 }

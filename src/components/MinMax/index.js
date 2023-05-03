@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import propTypes from './props';
 import styles from './style.module.css';
 
-import useWindowSize from '../hooks/useWindowSize';
+import useWindowSize from './../../hooks/useWindowSize';
 
 MinMaxLazy.propTypes = propTypes;
 

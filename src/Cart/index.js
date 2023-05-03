@@ -1,14 +1,14 @@
 import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
 
-import MinMax from './../MinMax';
+import MinMax from '../../MinMax';
 //context
 import { observer } from 'mobx-react-lite';
-import useStore from '../hooks/useStore';
+import useStore from '../../hooks/useStore';
 //import StoreContext from './../Context/store';
 export default observer(Cart);
 
-function Cart(props) {
-    const { onNext } = props;
+function Cart() {
     const [cart] = useStore('cart');
     const { products, total, remove, change } = cart;
 
@@ -67,9 +67,9 @@ function Cart(props) {
                 </tfoot>
             </table>
             <hr></hr>
-            <button type="button" className="btn btn-primary" onClick={onNext}>
+            <Link className="btn btn-primary" to={'/order'}>
                 in order
-            </button>
+            </Link>
         </div>
     );
 }

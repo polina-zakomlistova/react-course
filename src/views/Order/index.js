@@ -1,47 +1,57 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 import Styles from './style.module.css';
 //components
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import BModal from './../BootstrapModal';
+import BModal from '../../components/BootstrapModal';
 //context
 import { observer } from 'mobx-react-lite';
-import useStore from '../hooks/useStore';
-import SettingsContext from '../Context/settings';
+import useStore from '../../hooks/useStore';
 
 export default observer(Order);
 
-function Order(props) {
-    const { onNext, onPrev } = props;
+function Order() {
+    const navigate = useNavigate();
     const [order] = useStore('order');
     const { fields, fieldUpdate, formValid } = order;
-    const Settings = useContext(SettingsContext);
 
     const [show, setShow] = useState(false);
-
+    const [confirmed, setConfirmed] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const sendForm = () => {
-        onNext();
+        setConfirmed(true);
         order.send();
+        handleClose();
+    };
+
+    let onExited = () => {
+        if (confirmed) {
+            navigate('/result');
+        }
     };
 
     return (
-        <div
-            className={`${Styles} + ${
-                Settings.theme == 'dark' ? Styles.dark : ''
-            }`}
-        >
+        <div className={Styles}>
             <h1>Input data</h1>
             <hr></hr>
-            <BModal
-                title="Attention!"
-                body="Are you sure thet these orders are correct?"
-                onClose={handleClose}
-                onClick={sendForm}
-                show={show}
-            />
+            {
+                <BModal
+                    show={show}
+                    onClose={handleClose}
+                    onExited={onExited}
+                    onClick={sendForm}
+                    title={'Order'}
+                    body={
+                        <>
+                            <p>You are sure?</p>
+                            <p>This order will be sent</p>
+                        </>
+                    }
+                />
+            }
             <Form>
                 {fields.map((field) => (
                     <Form.Group
@@ -67,19 +77,19 @@ function Order(props) {
                         />
                     </Form.Group>
                 ))}
-                <button
+                <Button
                     type="submit"
                     className="btn btn-primary"
                     onClick={handleShow}
                     disabled={!formValid}
                 >
-                    in result
-                </button>
+                    Send
+                </Button>
             </Form>
 
-            <Button type="button" className="btn btn-warning" onClick={onPrev}>
-                in cart
-            </Button>
+            <Link className="btn btn-primary" to={'/'}>
+                Back to cart
+            </Link>
         </div>
     );
 }
